@@ -36,6 +36,23 @@ pipeline {
     }
 //--------------------------
 
+    stage('Docker Build and Push') {
+      steps {
+        withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_HUB_PASSWORD')]) {
+          sh 'sudo docker login -u hrefnhaila -p $DOCKER_HUB_PASSWORD'
+          sh 'printenv'
+          sh 'sudo docker build -t hrefnhaila/devops-app:""$GIT_COMMIT"" .'
+          sh 'sudo docker push hrefnhaila/devops-app:""$GIT_COMMIT""'
+        }
+
+      }
+    }
+//--------------------------
+
+
+
+
+
 		
 	}
 }

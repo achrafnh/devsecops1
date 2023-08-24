@@ -43,4 +43,4 @@ spec:
     targetPort: 9001
   selector:
     app: devsecops
-  type: LoadBalancer
+  type: NodePort

@@ -78,9 +78,9 @@ pipeline {
 
 
           //  sh "mvn sonar:sonar \
-  -Dsonar.projectKey=project-achraf \
-  -Dsonar.host.url=http://mytpm.eastus.cloudapp.azure.com:9999 \
-  -Dsonar.login=220bc162accb9564166b764d5343595dc0c3f5d8"
+ // -Dsonar.projectKey=project-achraf \
+ // -Dsonar.host.url=http://mytpm.eastus.cloudapp.azure.com:9999 \
+ // -Dsonar.login=220bc162accb9564166b764d5343595dc0c3f5d8"
          }
  
 		   }

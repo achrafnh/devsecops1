@@ -1,5 +1,10 @@
 pipeline {
   agent any
+
+	tools {
+        // Specify the JDK configured in the Global Tool Configuration
+        jdk 'Java 11'
+    }
 //--------------------------
   stages {
     stage('Build Artifact') {

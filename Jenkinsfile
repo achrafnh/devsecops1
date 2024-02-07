@@ -39,6 +39,24 @@ pipeline {
          }
        }
     }
+
+
+//--------------------------
+
+     stage('SonarQube - SAST') {
+       steps {
+         withSonarQubeEnv('SonarQubeConfig') {
+           sh "mvn sonar:sonar \
+  -Dsonar.projectKey=project-achraf \
+  -Dsonar.host.url=http://mytpm.eastus.cloudapp.azure.com:9999"
+         }
+         timeout(time: 2, unit: 'MINUTES') {
+           script {
+             waitForQualityGate abortPipeline: true
+           }
+         }
+       }
+     }
 //--------------------------
 	 stage('Vulnerability Scan - Docker Trivy') {
        steps {
@@ -52,14 +70,14 @@ pipeline {
      }
 //--------------------------
 
-	            stage('SonarQube - SAST') {
+	            stage('old working - SonarQube - SAST') {
           
            steps {
 		   catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
          withSonarQubeEnv('SonarQube') {
 
 
-            sh "mvn sonar:sonar \
+          //  sh "mvn sonar:sonar \
   -Dsonar.projectKey=project-achraf \
   -Dsonar.host.url=http://mytpm.eastus.cloudapp.azure.com:9999 \
   -Dsonar.login=220bc162accb9564166b764d5343595dc0c3f5d8"

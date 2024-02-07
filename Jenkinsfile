@@ -1,6 +1,14 @@
 pipeline {
   agent any
 
+  environment {
+    deploymentName = "devsecops"
+    containerName = "devsecops-container"
+    serviceName = "devsecops-svc"
+    imageName = "hrefnhaila/devops-app:${GIT_COMMIT}"
+    applicationURL="http://mytpm.eastus.cloudapp.azure.com"
+    applicationURI="/increment/99"
+  }
 
 //--------------------------
   stages {
@@ -101,33 +109,54 @@ stage('Vulnerability Scan owasp - dependency-check') {
       }
     }
 
-    //--------------------------
-    stage('Deployment Kubernetes  ') {
-      steps {
-        withKubeConfig([credentialsId: 'kubeconfig']) {
-               sh "sed -i 's#replace#hrefnhaila/devops-app:${GIT_COMMIT}#g' k8s_deployment_service.yaml"
-               sh "kubectl apply -f k8s_deployment_service.yaml"
-             }
-      }
-
-    }
-    //--------------------------
-
-    stage('Vulnerability Scan - Kubernetes') {
-       steps {
-         parallel(
-           "OPA Scan": {
-             sh 'sudo docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml'
-           },
-           "Kubesec Scan": {
-             sh "sudo bash kubesec-scan.sh"
-           },
-           "Trivy Scan": {
-             sh "sudo bash trivy-k8s-scan.sh"
+      stage('Vulnerability Scan - Kubernetes') {
+           steps {
+             parallel(
+               "OPA Scan": {
+                 sh 'sudo docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml'
+               },
+               "Kubesec Scan": {
+                 sh "sudo bash kubesec-scan.sh"
+               },
+               "Trivy Scan": {
+                 sh "sudo bash trivy-k8s-scan.sh"
+               }
+             )
            }
-         )
-       }
-     }
+         }
+
+    //--------------------------
+    //stage('Deployment Kubernetes  ') {
+     // steps {
+      //  withKubeConfig([credentialsId: 'kubeconfig']) {
+       //        sh "sed -i 's#replace#hrefnhaila/devops-app:${GIT_COMMIT}#g' k8s_deployment_service.yaml"
+        //       sh "kubectl apply -f k8s_deployment_service.yaml"
+         //    }
+     // }
+
+    //}
+
+
+         stage('K8S Deployment - DEV') {
+           steps {
+             parallel(
+               "Deployment": {
+                 withKubeConfig([credentialsId: 'kubeconfig']) {
+                   sh "bash k8s-deployment.sh"
+                 }
+               },
+               "Rollout Status": {
+                 withKubeConfig([credentialsId: 'kubeconfig']) {
+                   sh "bash k8s-deployment-rollout-status.sh"
+                 }
+               }
+             )
+           }
+         }
+
+    //--------------------------
+
+
 
 
       stage('OWASP ZAP - DAST') {

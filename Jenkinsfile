@@ -34,6 +34,18 @@ pipeline {
          }
        }
     }
+//--------------------------
+	 stage('Vulnerability Scan - Docker Trivy') {
+       steps {
+	        withCredentials([string(credentialsId: 'trivy_token', variable: 'TOKEN')]) {
+			 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+	 sh "sed -i 's#token_github#${TOKEN}#g' trivy-image-scan.sh"      
+	 sh "sudo bash trivy-image-scan.sh"
+	       }
+		}
+       }
+     }
+//--------------------------
 
 stage('Vulnerability Scan - Docker') {
    steps {
@@ -53,13 +65,14 @@ stage('Vulnerability Scan - Docker') {
 	            stage('SonarQube - SAST') {
           
            steps {
+		   catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
          withSonarQubeEnv('SonarQube') {
 
   withCredentials([string(credentialsId: 'token-sonar', variable: 'TOKEN_SONAR')]) {
             sh "mvn clean verify sonar:sonar -Dsonar.projectKey=myprojecttp -Dsonar.projectName='myprojecttp'-Dsonar.host.url=http:mytpm.eastus.cloudapp.azure.com:9112 -Dsonar.token=sqp_c31c51dd109a4d1127e014a427db98873cb01af6"
          }
  }
-      
+		   }
        }
           
  
@@ -107,17 +120,7 @@ stage('Vulnerability Scan - Docker') {
 //				}
 //		}
 // }
-//--------------------------
-	 stage('Vulnerability Scan - Docker Trivy') {
-       steps {
-	        withCredentials([string(credentialsId: 'trivy_token', variable: 'TOKEN')]) {
-			 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-	 sh "sed -i 's#token_github#${TOKEN}#g' trivy-image-scan.sh"      
-	 sh "sudo bash trivy-image-scan.sh"
-	       }
-		}
-       }
-     }
+
 	  
 //--------------------------
     stage('Docker Build and Push') {

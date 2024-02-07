@@ -59,7 +59,10 @@ pipeline {
          withSonarQubeEnv('SonarQube') {
 
 
-            sh "mvn clean verify sonar:sonar -Dsonar.projectKey=myprojecttp -Dsonar.projectName='myprojecttp'-Dsonar.host.url=http:mytpm.eastus.cloudapp.azure.com:9112 -Dsonar.token=sqp_c31c51dd109a4d1127e014a427db98873cb01af6"
+            sh "mvn sonar:sonar \
+  -Dsonar.projectKey=project-achraf \
+  -Dsonar.host.url=http://mytpm.eastus.cloudapp.azure.com:9999 \
+  -Dsonar.login=220bc162accb9564166b764d5343595dc0c3f5d8"
          }
  
 		   }

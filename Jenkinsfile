@@ -194,13 +194,13 @@ stage('Vulnerability Scan - Docker') {
 			  dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
   			  pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
 		        }
-			    success {
+			  //  success {
 		        	
-		        }
+		        //}
 		
-			    failure {
+			  //  failure {
 			   
-			    }
+			    //}
 	      }
 
 

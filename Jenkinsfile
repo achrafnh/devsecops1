@@ -35,6 +35,35 @@ pipeline {
        }
     }
 
+stage('Vulnerability Scan - Docker') {
+   steps {
+	    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+     		sh "mvn dependency-check:check"
+	    }
+		}
+		post { 
+      always { 
+		dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+				}
+		}
+ }
+
+
+
+	            stage('SonarQube - SAST') {
+          
+           steps {
+         withSonarQubeEnv('SonarQube') {
+
+  withCredentials([string(credentialsId: 'token-sonar', variable: 'TOKEN_SONAR')]) {
+            sh "mvn clean verify sonar:sonar -Dsonar.projectKey=myprojecttp -Dsonar.projectName='myprojecttp'-Dsonar.host.url=http:mytpm.eastus.cloudapp.azure.com:9112 -Dsonar.token=sqp_c31c51dd109a4d1127e014a427db98873cb01af6"
+         }
+ }
+      
+       }
+          
+ 
+     }
  //--------------------------
 
     

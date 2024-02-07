@@ -1,10 +1,7 @@
 pipeline {
   agent any
 
-	tools {
-        // Specify the JDK configured in the Global Tool Configuration
-        jdk 'Java 11'
-    }
+
 //--------------------------
   stages {
     stage('Build Artifact') {
@@ -53,31 +50,32 @@ pipeline {
        steps {
 	        withCredentials([string(credentialsId: 'trivy_token', variable: 'TOKEN')]) {
 			 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-	 sh "sed -i 's#token_github#${TOKEN}#g' trivy-image-scan.sh"      
-	 sh "sudo bash trivy-image-scan.sh"
+                 sh "sed -i 's#token_github#${TOKEN}#g' trivy-image-scan.sh"
+                 sh "sudo bash trivy-image-scan.sh"
 	       }
 		}
        }
      }
+
 //--------------------------
 
-       //     stage('old working - SonarQube - SAST') {
-          
-      //     steps {
-	//	   catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-      //   withSonarQubeEnv('SonarQube') {
-          //  sh "mvn sonar:sonar \
- // -Dsonar.projectKey=project-achraf \
- // -Dsonar.host.url=http://mytpm.eastus.cloudapp.azure.com:9999 \
- // -Dsonar.login=220bc162accb9564166b764d5343595dc0c3f5d8"
-      //   }
-	//	   }
-     //  }
-     //}
+//     stage('old working - SonarQube - SAST') {
 
-	//--------------------------  
+//     steps {
+//	   catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+//   withSonarQubeEnv('SonarQube') {
+//  sh "mvn sonar:sonar \
+// -Dsonar.projectKey=project-achraf \
+// -Dsonar.host.url=http://mytpm.eastus.cloudapp.azure.com:9999 \
+// -Dsonar.login=220bc162accb9564166b764d5343595dc0c3f5d8"
+//   }
+//	   }
+//  }
+//}
 
-stage('Vulnerability Scan - Docker') {
+//--------------------------
+
+stage('Vulnerability Scan owasp - dependency-check') {
    steps {
 	    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
      		sh "mvn dependency-check:check"
@@ -88,49 +86,6 @@ stage('Vulnerability Scan - Docker') {
 
 
 
- //--------------------------
-
-    
-//          stage('SonarQube - SAST') {
-//          
-//           steps {
-//         withSonarQubeEnv('SonarQube') {
-//
-//  withCredentials([string(credentialsId: 'token-sonar', variable: 'TOKEN_SONAR')]) {
-//            sh "mvn clean verify sonar:sonar -Dsonar.projectKey=myprojecttp -Dsonar.projectName='myprojecttp'-Dsonar.host.url=http://mytpm.eastus.cloudapp.azure.com:9112 -Dsonar.token=sqp_c31c51dd109a4d1127e014a427db98873cb01af6"
-//         }
-// }
-//      
-//       }
-//          
-// 
-//     }
-// //--------------------------
-//	
-//	  
-// stage("SonarQube - qualiyGate Status") {
-//            steps {
-//	catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-//              timeout(time: 3, unit: 'MINUTES') {
-//                waitForQualityGate abortPipeline: true
-//	      }
-//              }
-//            }
-//          }
-//
-//	  //--------------------------
-//    stage('Vulnerability Scan - Docker') {
-//   steps {
-//	    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-//     		sh "mvn dependency-check:check"
-//	    }
-//		}
-//		post { 
-//      always { 
-//				dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
-//				}
-//		}
-// }
 
 	  
 //--------------------------

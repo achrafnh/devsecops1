@@ -1,3 +1,5 @@
+@Library('slack') _
+
 pipeline {
   agent any
 
@@ -195,6 +197,7 @@ stage('Vulnerability Scan owasp - dependency-check') {
                     dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
                     pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP HTML Report', reportTitles: 'OWASP HTML Report', useWrapperFileDirectly: true])
+                    sendNotification currentBuild.result
 		        }
 			  //  success {
 		        	

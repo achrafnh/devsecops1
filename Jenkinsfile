@@ -190,10 +190,11 @@ stage('Vulnerability Scan owasp - dependency-check') {
 
 	      post {
 		        always {
-		          junit 'target/surefire-reports/*.xml'
-		          jacoco execPattern: 'target/jacoco.exec'
-			  dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
-  			  pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
+                    junit 'target/surefire-reports/*.xml'
+                    jacoco execPattern: 'target/jacoco.exec'
+                    dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+                    pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP HTML Report', reportTitles: 'OWASP HTML Report', useWrapperFileDirectly: true])
 		        }
 			  //  success {
 		        	
